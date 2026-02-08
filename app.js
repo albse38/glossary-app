@@ -20,6 +20,20 @@
     o.start(t0); o.stop(t0+ms/1000+0.02);
   };
 
+// --- Dev Banner --- 
+  const isDevEnv = () => {
+    const h = location.hostname || "";
+    return h.startsWith("dev--") || h.includes("localhost") || h.includes("127.0.0.1");
+  };
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    const badge = document.getElementById("envBadge");
+    if (badge && isDevEnv()) {
+      badge.classList.remove("hidden");
+    }
+  });
+
+
   // --- Data ---
   const THEMES = [
     {id:"studio_v1",name:"Glossary Studio",brand:"🐻",accent:"#b8c4ff",bg:"linear-gradient(180deg,#070a14,#0b1020 35%,#070a14)"},
