@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Glossary</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Glossary">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="splash" id="logoSplash">
+  <div class="splashInner">
+    <div class="logoWrap" aria-label="Glossary logo">
+      <div class="brainSpiral"></div>
+      <div class="brainLine"></div>
+      <div class="ear left"></div><div class="ear right"></div>
+      <div class="bearFace"></div>
+      <div class="eye left"></div><div class="eye right"></div>
+      <div class="nose"></div>
+      <div class="smile"></div>
+    </div>
+    <h2 class="splashTitle">Glossary</h2>
+    <div class="splashSub">quiet leveling • quick checks • drops</div>
+    <div class="splashDots" aria-hidden="true"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="brandMark" id="brandMark">🐻</div>
+    <div>
+      <div class="title">Glossary</div>
+      <div class="sub" id="headerSub">Choose a profile to start.</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card pane" id="paneFlow">
+    <div class="row">
+      <div class="pill"><span class="spark"></span><span id="flowTitle">Welcome</span></div>
+      <div class="pill" id="flowHint">Pick a profile</div>
+    </div>
+    <div class="divider"></div>
+    <div id="flowScreen"></div>
+  </section>
+
+  <section class="card pane hidden" id="panePlay">
+    <div class="row">
+      <div class="rowL">
+        <div class="pill"><span class="spark"></span><span id="seasonName">—</span></div>
+        <div class="pill" id="deckNamePill">Deck: —</div>
+        <div class="pill" id="streakPill">Streak: 0</div>
+      </div>
+      <div class="pill" id="nextMilestone">Keep going 💅</div>
+    </div>
+
+    <div class="hudBlock">
+      <div class="row">
+        <div>
+          <div class="big" id="levelText">Level 1</div>
+          <div class="tiny" id="xpText">Glow: 0 / 100</div>
+        </div>
+        <div class="pill" id="collectionPill">Mastered: 0/0</div>
+      </div>
+      <div class="bar"><div id="xpBar"></div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="rowL"><button class="good" id="startBurstBtn">Start burst</button></div>
+      <div class="tiny">Bursts are full-screen now (less techy, more game).</div>
+    </div>
+
+    <div class="toast" id="toast">—</div>
+  </section>
+
+  <section class="card pane hidden" id="paneCloset">
+    <div class="row">
+      <div class="pill"><span class="spark"></span><span id="closetTitle">Closet</span></div>
+      <div class="tiny" id="closetSubtitle">Unlocked stickers live here (per deck).</div>
+    </div>
+    <div class="divider"></div>
+    <div class="closetGrid" id="closetGrid"></div>
+  </section>
+
+  <section class="card pane hidden" id="paneSettings">
+    <div class="row">
+      <div class="pill"><span class="spark"></span>Settings</div>
+      <div class="tiny">Simple + cozy.</div>
+    </div>
+    <div class="divider"></div>
+    <div class="row">
+      <div>
+        <label>Burst size</label><br/>
+        <select id="burstSize"><option value="4">4</option><option value="6" selected>6</option></select>
+      </div>
+      <div>
+        <label>Sound</label><br/>
+        <button class="secondary" id="soundToggleBtn">Toggle</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="secondary" id="switchProfileBtn">Switch profile</button>
+  </section>
+</main>
+
+<nav class="bottomNav hidden" id="bottomNav" aria-label="App navigation">
+  <button class="tab active" id="tabPlay" aria-label="Play"><span class="ico">✨</span><span class="lbl">Play</span></button>
+  <button class="tab" id="tabCloset" aria-label="Closet"><span class="ico">🗂️</span><span class="lbl">Closet</span><span class="badge hidden" id="closetBadge">NEW</span></button>
+  <button class="tab" id="tabSettings" aria-label="Settings"><span class="ico">⚙️</span><span class="lbl">Settings</span></button>
+</nav>
+
+<section class="burstOverlay" id="burstOverlay" aria-hidden="true">
+  <div class="burstHUD">
+    <div class="left">
+      <div class="pill"><span class="spark"></span><span id="burstThemePill">—</span></div>
+      <div class="pill" id="burstDeckPill">Deck: —</div>
+      <div class="pill" id="burstProgressPill">Burst: 1/6</div>
+    </div>
+    <button class="secondary" id="exitBurstBtn">Exit</button>
+  </div>
+
+  <div class="burstGoal">Goal: Finish the burst to unlock a collectible ✨ (IRL prizes stay secret)</div>
+  <div class="burstHint">Tap = Reveal • Swipe right = Got it • Swipe left = Again</div>
+
+  <div class="burstCard" id="burstCard">
+    <div class="pill" id="burstMasteryPill">Mastery: —</div>
+    <div class="burstWord" id="burstWord">—</div>
+
+    <div class="burstReveal" id="burstReveal">
+      <div><b>Meaning:</b> <span id="burstDef"></span></div>
+      <div class="sp8"><b>Synonym:</b> <span id="burstSyn"></span></div>
+      <div class="sp8"><b>Sentence:</b> <span id="burstSent"></span></div>
+    </div>
+
+    <div class="burstActions">
+      <div class="left">
+        <button id="burstRevealBtn">Reveal</button>
+        <button class="good hidden" id="burstGotItBtn">Got it</button>
+        <button class="bad hidden" id="burstAgainBtn">Again</button>
+      </div>
+      <div class="pill" id="burstStreakPill">Streak: 0</div>
+    </div>
+
+    <div class="burstToast" id="burstToast">—</div>
+
+    <div class="divider"></div>
+
+    <div class="celebrate hidden" id="burstCelebrate">
+      <div class="sparkles"><div class="confetti" id="confettiBox"></div></div>
+      <h3 class="celebrateTitle">Burst Complete ✨</h3>
+      <div class="celebrateSub" id="celebrateSub">You unlocked a collectible.</div>
+
+      <div class="collectibleCard">
+        <div class="collectibleBig pop" id="collectibleBig">⭐️</div>
+        <div class="collectibleMeta" id="collectibleMeta">—</div>
+      </div>
+
+      <div class="celebrateActions">
+        <button class="good" id="nextBurstBtn">Next burst</button>
+        <button class="secondary" id="closeCelebrateBtn">Back</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
