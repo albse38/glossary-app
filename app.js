@@ -93,7 +93,7 @@
   const makeProfile=(name, themeId)=>{
     const id=uid();
     S.profiles[id] = {
-      id, name, themeId, burstSize:6, soundOn:true,
+      id, name, themeId, burstSize:6, qcIntensity:"standard", soundOn:true,
       progress:{} // by deck id -> {level,xp,streak,mastery:{},collectibles:[]}
     };
     return S.profiles[id];
@@ -283,7 +283,7 @@
   };
 
   // --- Burst mode + swipes ---
-  const burst = {queue:[],pos:0,revealed:false};
+  const burst = {queue:[],pos:0,revealed:false,qcShown:0};
 
   const pickIndex = ()=>{
     const ws=deck().words;
@@ -333,16 +333,96 @@
     haptic(8);
   };
 
+  // --- Quick Checks (prove-it moments) ---
+  const shuffle = (a)=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+  const unique = (arr)=> Array.from(new Set(arr));
+
+  const openQC = (wordObj, onResolve)=>{
+    const backdrop = $("qcBackdrop");
+    if(!backdrop){ onResolve(true); return; } // if modal isn't present, fall back to trust
+
+    $("qcWord").textContent = wordObj.word;
+    $("qcToast").textContent = "Pick the closest meaning";
+
+    const correct = (wordObj.synonym || wordObj.definition || "").trim();
+
+    const pool = deck().words
+      .map(w => (w.synonym || w.definition || "").trim())
+      .filter(x => x && x.toLowerCase() !== correct.toLowerCase());
+
+    const distractors = shuffle(unique(pool)).slice(0, 3);
+    const choices = shuffle([correct, ...distractors]);
+
+    const wrap = $("qcChoices");
+    wrap.innerHTML = "";
+
+    choices.forEach(ch => {
+      const b = document.createElement("button");
+      b.className = "choice";
+      b.textContent = ch;
+      b.onclick = ()=>{
+        const ok = ch.toLowerCase() === correct.toLowerCase();
+
+        if(ok){
+          $("qcToast").textContent = "Nice ✅";
+          if(p().soundOn){ tone(880,70,"sine",0.055); tone(1175,110,"sine",0.05); }
+          haptic(10);
+        } else {
+          $("qcToast").textContent = `Not quite — correct: ${correct}`;
+          if(p().soundOn){ tone(196,120,"square",0.03); }
+          haptic(16);
+        }
+
+        setTimeout(()=>{
+          backdrop.classList.add("hidden");
+          onResolve(ok);
+        }, 650);
+      };
+      wrap.appendChild(b);
+    });
+
+    backdrop.classList.remove("hidden");
+  };
+
+
   const gotIt = ()=>{
     if(!burst.revealed){ reveal(); return; }
     const w=cur();
     const pr=prog();
-    pr.streak += 1;
-    pr.mastery[w.word] = Math.min(3, (pr.mastery[w.word]||0) + 1);
-    addXP(10);
-    if(p().soundOn){ tone(784,70,"sine",0.05); tone(988,90,"sine",0.045); }
-    haptic(10);
-    nextInBurst();
+
+    const applyGotIt = (verified)=>{
+      if(verified){
+        pr.streak += 1;
+        pr.mastery[w.word] = Math.min(3, (pr.mastery[w.word]||0) + 1);
+        addXP(10);
+        if(p().soundOn){ tone(784,70,"sine",0.05); tone(988,90,"sine",0.045); }
+        haptic(10);
+      } else {
+        pr.streak = 0;
+        addXP(4);
+      }
+      nextInBurst();
+    };
+
+    // Your requested settings:
+    // Chill: min 2 QCs, 50%
+    // Standard: min 3 QCs, 80%
+    // Spicy: min 4 QCs, 95%
+    const q = p().qcIntensity || "standard";
+    const minPerBurst = (q === "chill") ? 2 : (q === "spicy") ? 4 : 3;
+    const prob = (q === "chill") ? 0.50 : (q === "spicy") ? 0.95 : 0.80;
+
+    const mustQC = burst.qcShown < minPerBurst;
+    const doQC = mustQC || (Math.random() < prob);
+
+    if(doQC){
+      openQC(w, (ok)=>{
+        burst.qcShown += 1;
+        applyGotIt(ok);
+      });
+    } else {
+      applyGotIt(true);
+    }
   };
 
   const again = ()=>{
@@ -424,7 +504,7 @@
   const startBurst = ()=>{
     const size = p().burstSize || 6;
     burst.queue = Array.from({length:size}, ()=>pickIndex());
-    burst.pos=0; burst.revealed=false;
+    burst.pos=0; burst.revealed=false; burst.qcShown=0;
     applyTheme();
     setBurst(true);
     burstRender();
@@ -465,6 +545,7 @@
   // --- Settings ---
   const updateSettingsUI = ()=>{
     $("burstSize").value = String(p().burstSize || 6);
+    if($("qcIntensity")) $("qcIntensity").value = p().qcIntensity || "standard";
   };
 
   // --- Swipes ---
@@ -509,8 +590,13 @@
   $("closeCelebrateBtn").addEventListener("click", ()=>{ $("burstCelebrate").classList.add("hidden"); setBurst(false); });
 
   $("burstSize").addEventListener("change", (e)=>{ p().burstSize=parseInt(e.target.value,10)||6; save(); });
+  $("qcIntensity")?.addEventListener("change", (e)=>{ p().qcIntensity = e.target.value || "standard"; save(); updateSettingsUI(); });
   $("soundToggleBtn").addEventListener("click", ()=>{ p().soundOn=!p().soundOn; save(); updateSettingsUI(); tone(660,60,"triangle",0.03); });
   $("switchProfileBtn").addEventListener("click", ()=>{ flow.step="profiles"; renderFlow(); });
+
+  $("qcCloseBtn")?.addEventListener("click", ()=> {
+    $("qcBackdrop")?.classList.add("hidden");
+  });
 
   // --- Boot ---
   const showSplash = ()=>{
