@@ -107,3 +107,19 @@ body.burst-on .burstOverlay{display:block;}
 .tab .lbl{font-size:11px;color: rgba(255,255,255,.72);}
 .tab.active{background: rgba(184,196,255,.10);border:1px solid rgba(184,196,255,.18);}
 .badge{position:absolute;right:16px;top:8px;font-size:10px;padding:4px 7px;border-radius:999px;background: rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);color: rgba(255,255,255,.85);}
+.envBadge{
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 5000;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .5px;
+  background: rgba(255, 92, 122, .18);
+  border: 1px solid rgba(255, 92, 122, .35);
+  color: rgba(255,255,255,.92);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.hidden{ display:none !important; } /* if you already have this, keep yours */
